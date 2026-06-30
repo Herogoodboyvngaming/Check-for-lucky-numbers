@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Số Đẹp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b, #ffd700);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shine 3s linear infinite;
+            text-shadow: none;
+            margin-bottom: 10px;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: #a0a0a0;
+            font-weight: 600;
+        }
+
+        .header .subtitle span {
+            color: #ffd700;
+        }
+
+        /* Clock */
+        .clock-box {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 16px;
+            padding: 15px 30px;
+            text-align: center;
+            margin-bottom: 25px;
+            animation: fadeIn 1.2s ease;
+        }
+
+        .clock-box .clock-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .clock-box #realtimeClock {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffd700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .clock-box #realtimeDate {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 25px;
+            animation: fadeInUp 1s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 18px 20px 18px 55px;
+            font-size: 1.3rem;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            border: 2px solid rgba(255,215,0,0.3);
+            border-radius: 16px;
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255,215,0,0.2);
+        }
+
+        .input-wrapper input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+
+        .input-wrapper .phone-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.4rem;
+        }
+
+        .carrier-info {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .carrier-info.show { display: flex; }
+
+        .carrier-viettel { background: rgba(0, 153, 68, 0.2); color: #4ade80; border: 1px solid rgba(0, 153, 68, 0.3); }
+        .carrier-mobifone { background: rgba(0, 102, 204, 0.2); color: #60a5fa; border: 1px solid rgba(0, 102, 204, 0.3); }
+        .carrier-vinaphone { background: rgba(204, 0, 0, 0.2); color: #f87171; border: 1px solid rgba(204, 0, 0, 0.3); }
+        .carrier-vietnamobile { background: rgba(255, 102, 0, 0.2); color: #fb923c; border: 1px solid rgba(255, 102, 0, 0.3); }
+        .carrier-gmobile { background: rgba(153, 0, 153, 0.2); color: #c084fc; border: 1px solid rgba(153, 0, 153, 0.3); }
+        .carrier-itelecom { background: rgba(0, 153, 153, 0.2); color: #22d3ee; border: 1px solid rgba(0, 153, 153, 0.3); }
+        .carrier-wintel { background: rgba(0, 128, 128, 0.2); color: #2dd4bf; border: 1px solid rgba(0, 128, 128, 0.3); }
+        .carrier-unknown { background: rgba(100, 100, 100, 0.2); color: #aaa; border: 1px solid rgba(100, 100, 100, 0.3); }
+
+        .error-msg {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-msg.show { display: flex; }
+
+        .btn-check {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-check:active {
+            transform: translateY(0);
+        }
+
+        .btn-carriers {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            border: 2px solid rgba(255,215,0,0.3);
+            border-radius: 16px;
+            background: rgba(255,215,0,0.05);
+            color: #ffd700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-carriers:hover {
+            background: rgba(255,215,0,0.15);
+            border-color: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        /* Result Section */
+        .result-section {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-section.show { display: block; }
+
+        .result-beautiful {
+            background: linear-gradient(135deg, rgba(0, 153, 68, 0.15), rgba(0, 200, 100, 0.1));
+            border: 2px solid rgba(0, 200, 100, 0.3);
+        }
+
+        .result-ugly {
+            background: linear-gradient(135deg, rgba(200, 50, 50, 0.15), rgba(150, 30, 30, 0.1));
+            border: 2px solid rgba(200, 50, 50, 0.3);
+        }
+
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .result-beautiful .result-title { color: #4ade80; }
+        .result-ugly .result-title { color: #f87171; }
+
+        .result-message {
+            font-size: 1rem;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .result-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: left;
+        }
+
+        .result-details h4 {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.95rem;
+        }
+
+        .detail-item:last-child { border-bottom: none; }
+
+        .detail-item .label { color: #aaa; }
+        .detail-item .value { font-weight: 600; }
+
+        /* History */
+        .history-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 25px;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .history-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-card h2 span { font-size: 1.5rem; }
+
+        .history-empty {
+            text-align: center;
+            color: #666;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(255,215,0,0.3);
+            border-radius: 3px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(0,0,0,0.3);
+            transform: translateX(5px);
+        }
+
+        .history-item.beautiful { border-left-color: #4ade80; }
+        .history-item.ugly { border-left-color: #f87171; }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-phone {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .history-meta {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .history-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .history-badge.beautiful {
+            background: rgba(0, 200, 100, 0.2);
+            color: #4ade80;
+        }
+
+        .history-badge.ugly {
+            background: rgba(200, 50, 50, 0.2);
+            color: #f87171;
+        }
+
+        .btn-clear {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #aaa;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-clear:hover {
+            background: rgba(255,50,50,0.2);
+            color: #f87171;
+            border-color: rgba(255,50,50,0.3);
+        }
+
+        /* Popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .popup-overlay.show { display: flex; }
+
+        .popup {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: popupIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .popup::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .popup-beautiful { border-color: #4ade80; }
+        .popup-ugly { border-color: #f87171; }
+        .popup-carriers { border-color: #ffd700; max-width: 500px; }
+        .popup-fake { border-color: #ef4444; }
+
+        .popup-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .popup-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .popup-beautiful .popup-title { color: #4ade80; }
+        .popup-ugly .popup-title { color: #f87171; }
+        .popup-carriers .popup-title { color: #ffd700; }
+        .popup-fake .popup-title { color: #ef4444; }
+
+        .popup-message {
+            font-size: 1rem;
+            color: #ccc;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .popup-phone {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-popup {
+            padding: 12px 35px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .popup-beautiful .btn-popup {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #fff;
+        }
+
+        .popup-ugly .btn-popup {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            color: #fff;
+        }
+
+        .popup-carriers .btn-popup {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+        }
+
+        .popup-fake .btn-popup {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            color: #fff;
+        }
+
+        .btn-popup:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Carriers list in popup */
+        .carriers-list {
+            text-align: left;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .carrier-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .carrier-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .carrier-item .carrier-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+        }
+
+        .carrier-item .carrier-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .carrier-item .carrier-prefixes {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* Confetti */
+        .confetti-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px; height: 10px;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+            font-size: 0.9rem;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .footer .heart {
+            color: #ff4757;
+            animation: heartbeat 1.5s ease infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .footer .vn-flag {
+            font-size: 1.2rem;
+        }
+
+        .footer strong {
+            color: #ffd700;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popupIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 2rem; }
+            .main-card, .history-card { padding: 20px; }
+            .clock-box #realtimeClock { font-size: 1.5rem; }
+            .popup { padding: 25px; }
+            .popup-title { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>✨ Kiểm Tra Số Đẹp ✨</h1>
+            <p class="subtitle">Code bởi : <span>Nguyễn Chí Dự ✨🇻🇳✨</span></p>
+        </div>
+
+        <!-- Clock -->
+        <div class="clock-box">
+            <div class="clock-label">🕐 Đồng Hồ Việt Nam (Real-time)</div>
+            <div id="realtimeClock">00:00:00</div>
+            <div id="realtimeDate">Đang tải...</div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="main-card">
+            <div class="input-group">
+                <label for="phoneInput">📱 Nhập số điện thoại để kiểm tra</label>
+                <div class="input-wrapper">
+                    <span class="phone-icon">📞</span>
+                    <input type="tel" id="phoneInput" placeholder="Ví dụ: 0987654321" maxlength="11" autocomplete="off">
+                </div>
+                <div class="carrier-info" id="carrierInfo"></div>
+                <div class="error-msg" id="errorMsg"></div>
+            </div>
+
+            <button class="btn-check" id="btnCheck" onclick="checkNumber()">
+                🔍 Kiểm Tra Ngay
+            </button>
+
+            <button class="btn-carriers" onclick="showCarriersPopup()">
+                📡 Nhà Mạng Hỗ Trợ
+            </button>
+
+            <!-- Result Section -->
+            <div class="result-section" id="resultSection">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-message" id="resultMessage"></div>
+                <div class="result-details" id="resultDetails"></div>
+            </div>
+        </div>
+
+        <!-- History -->
+        <div class="history-card">
+            <h2><span>📋</span> Lịch Sử Kiểm Tra</h2>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">Chưa có lịch sử kiểm tra nào</div>
+            </div>
+            <button class="btn-clear" id="btnClear" onclick="clearHistory()" style="display:none;">
+                🗑️ Xóa Lịch Sử
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Made in VN <span class="vn-flag">🇻🇳</span> with <span class="heart">❤️</span></p>
+            <p>Made by : <strong>Nguyễn Chí Dự ✨🇻🇳✨</strong></p>
+            <p style="margin-top:10px; font-size:0.8rem; color:#444;">© 2026 - Tất cả các quyền được bảo lưu</p>
+        </div>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup-overlay" id="popupOverlay" onclick="closePopup(event)">
+        <div class="popup" id="popup" onclick="event.stopPropagation()">
+            <div class="popup-icon" id="popupIcon"></div>
+            <div class="popup-title" id="popupTitle"></div>
+            <div class="popup-message" id="popupMessage"></div>
+            <div class="popup-phone" id="popupPhone"></div>
+            <div class="carriers-list" id="carriersList"></div>
+            <button class="btn-popup" id="btnPopup" onclick="closePopup()">Đóng</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== PARTICLES ==========
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 15 + 's';
+                p.style.animationDuration = (10 + Math.random() * 10) + 's';
+                p.style.width = (2 + Math.random() * 4) + 'px';
+                p.style.height = p.style.width;
+                container.appendChild(p);
+            }
+        }
+        createParticles();
+
+        // ========== CLOCK ==========
+        function updateClock() {
+            const now = new Date();
+            const vnTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"}));
+
+            const hours = String(vnTime.getHours()).padStart(2, '0');
+            const minutes = String(vnTime.getMinutes()).padStart(2, '0');
+            const seconds = String(vnTime.getSeconds()).padStart(2, '0');
+
+            document.getElementById('realtimeClock').textContent = `${hours}:${minutes}:${seconds}`;
+
+            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+            const dayName = days[vnTime.getDay()];
+            const date = String(vnTime.getDate()).padStart(2, '0');
+            const month = String(vnTime.getMonth() + 1).padStart(2, '0');
+            const year = vnTime.getFullYear();
+
+            document.getElementById('realtimeDate').textContent = `${dayName}, ${date}/${month}/${year}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ========== CARRIER DETECTION ==========
+        const carriers = {
+            viettel: {
+                name: 'Viettel',
+                prefixes: ['096','097','098','032','033','034','035','036','037','038','039','086'],
+                class: 'carrier-viettel',
+                icon: '🟢'
+            },
+            mobifone: {
+                name: 'Mobifone',
+                prefixes: ['090','093','070','079','077','076','078','089'],
+                class: 'carrier-mobifone',
+                icon: '🔵'
+            },
+            vinaphone: {
+                name: 'Vinaphone',
+                prefixes: ['091','094','083','084','085','081','082','088'],
+                class: 'carrier-vinaphone',
+                icon: '🔴'
+            },
+            vietnamobile: {
+                name: 'Vietnamobile',
+                prefixes: ['092','056','058'],
+                class: 'carrier-vietnamobile',
+                icon: '🟠'
+            },
+            gmobile: {
+                name: 'Gmobile',
+                prefixes: ['099','059'],
+                class: 'carrier-gmobile',
+                icon: '🟣'
+            },
+            itelecom: {
+                name: 'iTelecom',
+                prefixes: ['087'],
+                class: 'carrier-itelecom',
+                icon: '🔵'
+            },
+            wintel: {
+                name: 'Wintel',
+                prefixes: ['055'],
+                class: 'carrier-wintel',
+                icon: '🟢'
+            }
+        };
+
+        // ========== ANTI-FAKE: VALID PREFIXES ==========
+        const allValidPrefixes = [];
+        for (const key in carriers) {
+            allValidPrefixes.push(...carriers[key].prefixes);
+        }
+
+        // ========== ANTI-FAKE: KNOWN FAKE/INVALID PREFIXES ==========
+        const fakePrefixes = [
+            '000','001','002','003','004','005','006','007','008','009',
+            '010','011','012','013','014','015','016','017','018','019',
+            '020','021','022','023','024','025','026','027','028','029',
+            '030','031','040','041','042','043','044','045','046','047','048','049',
+            '050','051','052','053','054','057','060','061','062','063','064','065','066','067','068','069',
+            '071','072','073','074','075','080','080','081','082','083','084','085','086','087','088','089',
+            '090','091','092','093','094','095','096','097','098','099'
+        ];
+        // Note: 090-099 are valid but need exact match with carrier prefixes above
+        // The real check is done via allValidPrefixes
+
+        function detectCarrier(phone) {
+            const clean = phone.replace(/\D/g, '');
+            if (clean.length < 3) return null;
+            const prefix = clean.substring(0, 3);
+            for (const key in carriers) {
+                if (carriers[key].prefixes.includes(prefix)) {
+                    return carriers[key];
+                }
+            }
+            return { name: 'Không xác định', class: 'carrier-unknown', icon: '⚪' };
+        }
+
+        // ========== ANTI-FAKE VALIDATION ==========
+        function validatePhone(phone) {
+            const clean = phone.replace(/\D/g, '');
+
+            // Rule 1: Must be 10 or 11 digits
+            if (clean.length !== 10 && clean.length !== 11) {
+                return { valid: false, reason: 'Số điện thoại phải có đúng 10 hoặc 11 số!' };
+            }
+
+            // Rule 2: Must start with 0
+            if (!clean.startsWith('0')) {
+                return { valid: false, reason: 'Số điện thoại Việt Nam phải bắt đầu bằng số 0!' };
+            }
+
+            // Rule 3: Must have valid carrier prefix
+            const prefix = clean.substring(0, 3);
+            const isValidPrefix = allValidPrefixes.includes(prefix);
+            if (!isValidPrefix) {
+                return { valid: false, reason: `Đầu số "${prefix}" không thuộc nhà mạng nào tại Việt Nam. Có thể là số giả mạo!` };
+            }
+
+            // Rule 4: Check for suspicious patterns (all same digits)
+            const allSame = clean.split('').every(d => d === clean[0]);
+            if (allSame) {
+                return { valid: false, reason: 'Số điện thoại có dấu hiệu giả mạo (tất cả các số giống nhau)!' };
+            }
+
+            // Rule 5: Check for sequential fake patterns
+            const digits = clean.split('').map(Number);
+            let sequentialCount = 1;
+            for (let i = 1; i < digits.length; i++) {
+                if (Math.abs(digits[i] - digits[i-1]) <= 1) sequentialCount++;
+            }
+            // Too sequential is suspicious but not necessarily fake, just warn
+
+            // Rule 6: Check blacklist patterns (common fake numbers)
+            const blacklist = ['0000000000','1111111111','2222222222','3333333333','4444444444',
+                             '5555555555','6666666666','7777777777','8888888888','9999999999',
+                             '0123456789','0987654321'];
+            if (blacklist.includes(clean)) {
+                return { valid: false, reason: 'Số điện thoại nằm trong danh sách số giả mạo!' };
+            }
+
+            return { valid: true, reason: '' };
+        }
+
+        document.getElementById('phoneInput').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length > 11) val = val.slice(0, 11);
+            e.target.value = val;
+
+            // Clear error when typing
+            document.getElementById('errorMsg').classList.remove('show');
+            e.target.classList.remove('error');
+
+            const info = document.getElementById('carrierInfo');
+            const carrier = detectCarrier(val);
+
+            if (carrier && val.length >= 3) {
+                info.innerHTML = `${carrier.icon} Nhà mạng: <strong>${carrier.name}</strong>`;
+                info.className = `carrier-info show ${carrier.class}`;
+            } else {
+                info.className = 'carrier-info';
+                info.innerHTML = '';
+            }
+        });
+
+        // ========== BEAUTIFUL NUMBER CHECK ==========
+        function checkBeautifulNumber(phone) {
+            const clean = phone.replace(/\D/g, '');
+            const digits = clean.split('').map(Number);
+            const last6 = digits.slice(-6);
+            const last4 = digits.slice(-4);
+            const last3 = digits.slice(-3);
+            const last2 = digits.slice(-2);
+
+            let score = 0;
+            let reasons = [];
+
+            // Check same digits
+            function allSame(arr) { return arr.every(d => d === arr[0]); }
+            function isAscending(arr) {
+                for (let i = 1; i < arr.length; i++) if (arr[i] !== arr[i-1] + 1) return false;
+                return true;
+            }
+            function isDescending(arr) {
+                for (let i = 1; i < arr.length; i++) if (arr[i] !== arr[i-1] - 1) return false;
+                return true;
+            }
+            function isRepeatPattern(arr) {
+                if (arr.length % 2 !== 0) return false;
+                const half = arr.length / 2;
+                for (let i = 0; i < half; i++) if (arr[i] !== arr[i + half]) return false;
+                return true;
+            }
+            function countPairs(arr) {
+                let pairs = 0;
+                for (let i = 0; i < arr.length - 1; i++) if (arr[i] === arr[i+1]) pairs++;
+                return pairs;
+            }
+
+            // 6 same digits
+            if (allSame(last6)) { score += 50; reasons.push('6 số cuối giống nhau (siêu VIP)'); }
+            // 4 same digits
+            else if (allSame(last4)) { score += 30; reasons.push('4 số cuối giống nhau (VIP)'); }
+            // 3 same digits
+            else if (allSame(last3)) { score += 15; reasons.push('3 số cuối giống nhau'); }
+
+            // Ascending
+            if (isAscending(last4)) { score += 20; reasons.push('4 số cuối tăng dần'); }
+            else if (isAscending(last3)) { score += 10; reasons.push('3 số cuối tăng dần'); }
+
+            // Descending
+            if (isDescending(last4)) { score += 20; reasons.push('4 số cuối giảm dần'); }
+            else if (isDescending(last3)) { score += 10; reasons.push('3 số cuối giảm dần'); }
+
+            // Repeat pattern
+            if (isRepeatPattern(last6)) { score += 25; reasons.push('6 số cuối lặp lại (AB.AB.AB)'); }
+            else if (isRepeatPattern(last4)) { score += 15; reasons.push('4 số cuối lặp lại (AB.AB)'); }
+
+            // Pairs
+            const pairs6 = countPairs(last6);
+            if (pairs6 >= 3) { score += 15; reasons.push('Nhiều cặp số đôi liên tiếp'); }
+            else if (pairs6 >= 2) { score += 8; reasons.push('Có cặp số đôi liên tiếp'); }
+
+            // Special numbers
+            const special = ['8683','6838','3838','6868','1618','8683','1102','2000','1111','2222','3333','4444','5555','6666','7777','8888','9999'];
+            const last4Str = last4.join('');
+            if (special.includes(last4Str)) { score += 20; reasons.push('Số đặc biệt may mắn'); }
+
+            // Lucky 6, 8, 9
+            const luckyCount = last6.filter(d => d === 6 || d === 8 || d === 9).length;
+            if (luckyCount >= 5) { score += 10; reasons.push('Nhiều số may mắn (6, 8, 9)'); }
+
+            // No 4, 7 (unlucky)
+            const unluckyCount = last6.filter(d => d === 4 || d === 7).length;
+            if (unluckyCount === 0) { score += 5; reasons.push('Không có số 4, 7 (xui xẻo)'); }
+
+            // Total sum
+            const sum = digits.reduce((a,b) => a+b, 0);
+            if (sum % 10 === 0 || sum % 10 === 6 || sum % 10 === 8 || sum % 10 === 9) {
+                score += 5; reasons.push('Tổng số điểm đẹp');
+            }
+
+            return { score, reasons, isBeautiful: score >= 15 };
+        }
+
+        // ========== CHECK FUNCTION ==========
+        function checkNumber() {
+            const input = document.getElementById('phoneInput');
+            const phone = input.value.trim().replace(/\D/g, '');
+            const errorMsg = document.getElementById('errorMsg');
+
+            // ANTI-FAKE VALIDATION
+            const validation = validatePhone(phone);
+            if (!validation.valid) {
+                input.classList.add('error');
+                errorMsg.innerHTML = `⚠️ ${validation.reason}`;
+                errorMsg.classList.add('show');
+
+                // Show fake popup
+                showFakePopup(validation.reason);
+                return;
+            }
+
+            // Clear error
+            input.classList.remove('error');
+            errorMsg.classList.remove('show');
+
+            const carrier = detectCarrier(phone);
+            const result = checkBeautifulNumber(phone);
+            const formattedPhone = phone.replace(/(\d{4})(\d{3})(\d{3})/, '$1.$2.$3');
+
+            // Show result section
+            const resultSection = document.getElementById('resultSection');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            const resultDetails = document.getElementById('resultDetails');
+
+            resultSection.className = 'result-section show ' + (result.isBeautiful ? 'result-beautiful' : 'result-ugly');
+
+            if (result.isBeautiful) {
+                resultIcon.textContent = '🎉';
+                resultTitle.textContent = 'Số Đẹp!';
+                resultMessage.innerHTML = `Số điện thoại <strong>${formattedPhone}</strong> là số đẹp! Bạn thật may mắn! 🍀`;
+            } else {
+                resultIcon.textContent = '😔';
+                resultTitle.textContent = 'Số Bình Thường';
+                resultMessage.innerHTML = `Số điện thoại <strong>${formattedPhone}</strong> là số bình thường. Đừng buồn, số nào cũng có giá trị riêng! 💪`;
+            }
+
+            // Details
+            let detailsHTML = '<h4>📊 Chi tiết phân tích</h4>';
+            detailsHTML += `<div class="detail-item"><span class="label">Nhà mạng:</span><span class="value">${carrier ? carrier.icon + ' ' + carrier.name : 'Không xác định'}</span></div>`;
+            detailsHTML += `<div class="detail-item"><span class="label">Điểm số:</span><span class="value">${result.score}/100</span></div>`;
+            if (result.reasons.length > 0) {
+                detailsHTML += `<div class="detail-item"><span class="label">Lý do:</span><span class="value">${result.reasons.join(', ')}</span></div>`;
+            }
+            resultDetails.innerHTML = detailsHTML;
+
+            // Show popup
+            showPopup(result.isBeautiful, formattedPhone, result.score, carrier);
+
+            // Save to history
+            saveToHistory(phone, formattedPhone, result.isBeautiful, carrier, result.score);
+
+            // Scroll to result
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ========== FAKE NUMBER POPUP ==========
+        function showFakePopup(reason) {
+            const overlay = document.getElementById('popupOverlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popupIcon');
+            const title = document.getElementById('popupTitle');
+            const message = document.getElementById('popupMessage');
+            const phoneEl = document.getElementById('popupPhone');
+            const carriersList = document.getElementById('carriersList');
+            const btn = document.getElementById('btnPopup');
+
+            popup.className = 'popup popup-fake';
+            icon.textContent = '🚫';
+            title.textContent = 'Phát Hiện Số Giả Mạo!';
+            message.innerHTML = reason + '<br><br>Vui lòng nhập số điện thoại thật của nhà mạng Việt Nam!';
+            phoneEl.textContent = '';
+            carriersList.innerHTML = '';
+            btn.textContent = 'Đã Hiểu';
+
+            overlay.classList.add('show');
+        }
+
+        // ========== CARRIERS POPUP ==========
+        function showCarriersPopup() {
+            const overlay = document.getElementById('popupOverlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popupIcon');
+            const title = document.getElementById('popupTitle');
+            const message = document.getElementById('popupMessage');
+            const phoneEl = document.getElementById('popupPhone');
+            const carriersList = document.getElementById('carriersList');
+            const btn = document.getElementById('btnPopup');
+
+            popup.className = 'popup popup-carriers';
+            icon.textContent = '📡';
+            title.textContent = 'Nhà Mạng Hỗ Trợ';
+            message.textContent = 'Hệ thống hỗ trợ kiểm tra số đẹp cho tất cả các nhà mạng tại Việt Nam:';
+            phoneEl.textContent = '';
+            btn.textContent = 'Đóng';
+
+            let listHTML = '';
+            for (const key in carriers) {
+                const c = carriers[key];
+                listHTML += `
+                    <div class="carrier-item">
+                        <div class="carrier-icon">${c.icon}</div>
+                        <div>
+                            <div class="carrier-name">${c.name}</div>
+                            <div class="carrier-prefixes">Đầu số: ${c.prefixes.join(', ')}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            carriersList.innerHTML = listHTML;
+
+            overlay.classList.add('show');
+        }
+
+        // ========== POPUP ==========
+        function showPopup(isBeautiful, phone, score, carrier) {
+            const overlay = document.getElementById('popupOverlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popupIcon');
+            const title = document.getElementById('popupTitle');
+            const message = document.getElementById('popupMessage');
+            const phoneEl = document.getElementById('popupPhone');
+            const carriersList = document.getElementById('carriersList');
+            const btn = document.getElementById('btnPopup');
+
+            popup.className = 'popup ' + (isBeautiful ? 'popup-beautiful' : 'popup-ugly');
+            carriersList.innerHTML = '';
+
+            if (isBeautiful) {
+                icon.textContent = '🎊';
+                title.textContent = 'Chúc Mừng!';
+                message.innerHTML = 'Bạn đã sở hữu một số điện thoại đẹp!<br>Đây là số may mắn, mang lại tài lộc và thành công! 🌟';
+                btn.textContent = 'Tuyệt Vời! 🎉';
+                createConfetti();
+            } else {
+                icon.textContent = '💔';
+                title.textContent = 'Thất Vọng...';
+                message.innerHTML = 'Số này chưa đạt tiêu chuẩn số đẹp.<br>Nhưng đừng lo, ý nghĩa số điện thoại nằm ở cách bạn sử dụng nó! 💪';
+                btn.textContent = 'Đã Hiểu';
+            }
+
+            phoneEl.textContent = phone;
+            overlay.classList.add('show');
+        }
+
+        function closePopup(e) {
+            if (e && e.target !== e.currentTarget && e.target.id !== 'btnPopup') return;
+            document.getElementById('popupOverlay').classList.remove('show');
+            document.getElementById('confettiContainer').innerHTML = '';
+        }
+
+        // ========== CONFETTI ==========
+        function createConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = ['#ffd700', '#ff6b6b', '#4ade80', '#60a5fa', '#c084fc', '#fb923c'];
+
+            for (let i = 0; i < 50; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDelay = Math.random() * 2 + 's';
+                conf.style.animationDuration = (2 + Math.random() * 2) + 's';
+                conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                conf.style.width = (5 + Math.random() * 10) + 'px';
+                conf.style.height = conf.style.width;
+                container.appendChild(conf);
+
+                setTimeout(() => conf.remove(), 4000);
+            }
+        }
+
+        // ========== LOCAL STORAGE HISTORY ==========
+        function saveToHistory(rawPhone, formattedPhone, isBeautiful, carrier, score) {
+            let history = JSON.parse(localStorage.getItem('phoneCheckHistory') || '[]');
+
+            // Avoid duplicates at top
+            if (history.length > 0 && history[0].rawPhone === rawPhone) return;
+
+            const entry = {
+                rawPhone,
+                formattedPhone,
+                isBeautiful,
+                carrierName: carrier ? carrier.name : 'Không xác định',
+                carrierIcon: carrier ? carrier.icon : '⚪',
+                carrierClass: carrier ? carrier.class : 'carrier-unknown',
+                score,
+                timestamp: new Date().toISOString()
+            };
+
+            history.unshift(entry);
+            if (history.length > 50) history = history.slice(0, 50);
+
+            localStorage.setItem('phoneCheckHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('phoneCheckHistory') || '[]');
+            const list = document.getElementById('historyList');
+            const btnClear = document.getElementById('btnClear');
+
+            if (history.length === 0) {
+                list.innerHTML = '<div class="history-empty">Chưa có lịch sử kiểm tra nào</div>';
+                btnClear.style.display = 'none';
+                return;
+            }
+
+            btnClear.style.display = 'inline-block';
+            let html = '';
+
+            history.forEach(item => {
+                const date = new Date(item.timestamp);
+                const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString('vi-VN');
+
+                html += `
+                    <div class="history-item ${item.isBeautiful ? 'beautiful' : 'ugly'}">
+                        <div class="history-info">
+                            <div class="history-phone">${item.carrierIcon} ${item.formattedPhone}</div>
+                            <div class="history-meta">${item.carrierName} • ${dateStr} ${timeStr} • Điểm: ${item.score}</div>
+                        </div>
+                        <div class="history-badge ${item.isBeautiful ? 'beautiful' : 'ugly'}">
+                            ${item.isBeautiful ? '✨ Số Đẹp' : '➖ Bình Thường'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+        }
+
+        function clearHistory() {
+            if (confirm('Bạn có chắc muốn xóa toàn bộ lịch sử?')) {
+                localStorage.removeItem('phoneCheckHistory');
+                renderHistory();
+            }
+        }
+
+        // Load history on start
+        renderHistory();
+
+        // Enter key support
+        document.getElementById('phoneInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkNumber();
+        });
+    </script>
+</body>
+</html>
